@@ -679,15 +679,6 @@ def main():
     # ========================================================
     
     st.markdown("---")
-    st.markdown("""
-    <center>
-    
-    **🗺️ Universal Skills Roadmap**
-    
-    *Learn Anything. Master Any Field. Your Path. Your Pace. Your Progress.*
-    
-    </center>
-    """, unsafe_allow_html=True)
 
 
 if __name__ == "__main__":
