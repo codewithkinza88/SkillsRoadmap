@@ -36,10 +36,25 @@ MODEL_NAME = "openai/gpt-oss-20b"
 SYSTEM_PROMPT = """
 
 You are RoadMap AI, an intelligent personalized learning
-roadmap generator for students.
+roadmap generator for students across ALL fields and domains.
 
 Your job is to create a realistic, structured and personalized
 learning roadmap based on the student's information.
+
+You are expert at creating roadmaps for:
+- Technology & Programming
+- Business & Entrepreneurship
+- Arts & Design
+- Music & Performance
+- Languages & Linguistics
+- Science & Research
+- Sports & Fitness
+- Health & Medicine
+- Literature & Writing
+- History & Social Studies
+- Mathematics & Logic
+- Environmental Studies
+- Any other field or skill
 
 ============================================================
 STUDENT LEVELS
@@ -47,26 +62,26 @@ STUDENT LEVELS
 
 BEGINNER:
 - Assume little or no previous knowledge.
-- Start from fundamentals.
-- Explain concepts in a logical order.
-- Include simple exercises.
-- Include beginner-friendly projects.
+- Start from fundamentals and basics.
+- Explain concepts in a logical, easy-to-understand order.
+- Include simple exercises and activities.
+- Include beginner-friendly projects relevant to the field.
 - Do not overwhelm the student.
 
 INTERMEDIATE:
 - Assume the student already knows the fundamentals.
 - Avoid unnecessary beginner material.
-- Focus on skill improvement.
+- Focus on skill improvement and deeper understanding.
 - Introduce intermediate and advanced concepts.
-- Include practical projects.
+- Include practical projects and real-world applications.
 
 EXPERT:
 - Assume strong existing knowledge.
 - Skip basic concepts.
-- Focus on advanced and specialized topics.
-- Include challenging real-world projects.
-- Include production-level or research-oriented concepts
-  when appropriate.
+- Focus on advanced, specialized, and niche topics.
+- Include challenging projects and expert-level work.
+- Include production-level, research-oriented, or mastery-level
+  concepts when appropriate.
 
 ============================================================
 TIME MANAGEMENT
@@ -110,14 +125,16 @@ Do NOT generate the same roadmap for every student.
 
 The roadmap should change depending on:
 
+- Field/Domain (tech, arts, business, sports, languages, etc.)
 - Level
 - Goal
 - Duration
 - Daily time
-- Existing skills
-- Learning style
-- Purpose
-- Interests
+- Existing skills and knowledge
+- Learning style preferences
+- Purpose (career, hobby, certification, passion, etc.)
+- Interests and specializations
+- Context and background
 
 ============================================================
 OUTPUT
@@ -312,6 +329,7 @@ def roadmap_to_markdown(data):
 # returns the AI-generated roadmap. It also handles errors.
 
 def generate_roadmap(
+    field_type,
     goal,
     level,
     duration,
@@ -329,6 +347,9 @@ def generate_roadmap(
     user_prompt = f"""
 
     Create a personalized learning roadmap for this student.
+
+    Field/Domain:
+    {field_type}
 
     Learning Goal:
     {goal}
@@ -354,7 +375,7 @@ def generate_roadmap(
     Specific Interests:
     {interests}
 
-    Make the roadmap realistic and personalized.
+    Make the roadmap realistic, practical, and personalized for this field.
 
     Return valid JSON only.
 
@@ -421,6 +442,7 @@ def generate_roadmap(
 # User ke inputs ko AI ko bhejte hain, aur output display karte hain.
 
 def create_roadmap(
+    field_type,
     goal,
     level,
     duration,
@@ -436,6 +458,7 @@ def create_roadmap(
     # --------------------------------------------------------
 
     data, error = generate_roadmap(
+        field_type,
         goal,
         level,
         duration,
@@ -486,9 +509,9 @@ def main():
     <div style="text-align: center; padding: 40px 20px; 
                 background: linear-gradient(135deg, #667eea, #764ba2); 
                 border-radius: 15px; color: white; margin-bottom: 30px;">
-        <h1 style="font-size: 48px; margin-bottom: 10px;">🗺️ Skills Roadmap</h1>
-        <p style="font-size: 20px; line-height: 1.6;">Your personalized learning journey.</p>
-        <p style="font-size: 18px;">Tell us where you are. We'll help you discover where to go. ✨</p>
+        <h1 style="font-size: 48px; margin-bottom: 10px;">🗺️ Universal Skills Roadmap</h1>
+        <p style="font-size: 20px; line-height: 1.6;">Learn anything. Master any field.</p>
+        <p style="font-size: 18px;">Tech, arts, business, languages, sports, or beyond. Tell us your goal. We'll create your perfect learning path. ✨</p>
     </div>
     """, unsafe_allow_html=True)
     
@@ -497,10 +520,9 @@ def main():
     # ========================================================
     
     st.markdown("""
-    # 🎓 Build Your Personalized Skills Roadmap
+    # 🎓 Build Your Personalized Learning Roadmap
     
-    Tell us about yourself and we will create a
-    learning path designed specifically for you.
+    Choose any field. Set your pace. Get your custom roadmap.
     """)
     
     # ========================================================
@@ -513,10 +535,32 @@ def main():
     with col1:
         st.subheader("📋 Learning Profile")
         
+        # Field/Domain selector - پہلے چنیں کہ آپ کس میدان میں سیکھنا چاہتے ہیں
+        field_type = st.selectbox(
+            label="🎯 What field do you want to learn?",
+            options=[
+                "Technology & Programming",
+                "Business & Entrepreneurship",
+                "Arts & Design",
+                "Music & Performance",
+                "Languages & Linguistics",
+                "Science & Research",
+                "Sports & Fitness",
+                "Health & Medicine",
+                "Literature & Writing",
+                "History & Social Studies",
+                "Mathematics & Logic",
+                "Environmental Studies",
+                "Other Field"
+            ],
+            index=0,
+            help="Select the general field/domain for your learning goal"
+        )
+        
         goal = st.text_input(
-            label="🎯 What do you want to learn?",
-            placeholder="e.g. Data Science, Web Development, Artificial Intelligence...",
-            help="Enter your main learning goal."
+            label="🎯 What specifically do you want to learn?",
+            placeholder="e.g. Machine Learning, Graphic Design, Piano, Spanish, Fitness Training, Data Analysis...",
+            help="Enter your specific learning goal within the chosen field"
         )
         
         level = st.selectbox(
@@ -527,7 +571,7 @@ def main():
         
         duration = st.selectbox(
             label="⏳ How much time do you have?",
-            options=["7 days", "2 weeks", "1 month", "2 months", "3 months", "6 months", "1 year"],
+            options=["1 week", "2 weeks", "1 month", "2 months", "3 months", "6 months", "1 year"],
             index=4  # Default to 3 months
         )
         
@@ -542,9 +586,10 @@ def main():
         st.subheader("🎯 Your Preferences")
         
         current_skills = st.text_area(
-            label="💻 What do you already know?",
-            placeholder="e.g. Basic Python, HTML/CSS, Statistics...",
-            height=100
+            label="💡 What do you already know?",
+            placeholder="e.g. Basic Python, Watercolor painting, IELTS B2 level, Office management...",
+            height=100,
+            help="List your existing knowledge and related skills"
         )
         
         learning_style = st.radio(
@@ -555,14 +600,15 @@ def main():
         
         purpose = st.selectbox(
             label="🎓 Why do you want to learn this?",
-            options=["Career", "University / Studies", "Personal Learning", "Build a Project", "Freelancing", "Other"],
+            options=["Career Growth", "Academic / Certification", "Personal Hobby", "Build/Create Something", "Freelancing", "Passion / Interest", "Other"],
             index=0
         )
         
         interests = st.text_area(
-            label="⭐ Specific Interests (Optional)",
-            placeholder="e.g. Machine Learning, NLP, Computer Vision...",
-            height=80
+            label="⭐ Specific Interests or Focus Areas (Optional)",
+            placeholder="e.g. Photography basics, Social Media Marketing, Classical Piano, Environmental Conservation...",
+            height=80,
+            help="Mention any specific topics or aspects you're most interested in"
         )
     
     # ========================================================
@@ -586,6 +632,7 @@ def main():
             with st.spinner("🚀 Generating your personalized roadmap..."):
                 
                 roadmap_markdown = create_roadmap(
+                    field_type,
                     goal,
                     level,
                     duration,
@@ -608,7 +655,7 @@ def main():
     st.markdown("""
     # 🗺️ Your Personalized Roadmap
     
-    Your personalized learning journey will appear below.
+    Your custom learning path will appear below.
     """)
     
     # Display roadmap agar generate ho gaya ho
@@ -616,13 +663,15 @@ def main():
         st.markdown(st.session_state.roadmap_output)
     else:
         st.info("""
-        ### 👋 Welcome to Skills Roadmap!
+        ### 👋 Welcome to Universal Skills Roadmap!
         
-        Fill in your learning profile above and click:
+        Learn anything you want - from technology to arts, languages to sports!
         
-        ### ✨ Generate My Roadmap
+        1. **Pick your field** - Choose the domain you want to learn
+        2. **Fill your profile** - Tell us your goal, level, and preferences
+        3. **Click Generate** - Get your personalized roadmap
         
-        Your personalized roadmap will appear here.
+        Your custom learning path will appear here.
         """)
     
     # ========================================================
@@ -633,9 +682,9 @@ def main():
     st.markdown("""
     <center>
     
-    **🗺️ Skills Roadmap**
+    **🗺️ Universal Skills Roadmap**
     
-    *Your path. Your pace. Your progress.*
+    *Learn Anything. Master Any Field. Your Path. Your Pace. Your Progress.*
     
     </center>
     """, unsafe_allow_html=True)
