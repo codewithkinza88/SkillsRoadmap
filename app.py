@@ -1,11 +1,11 @@
-# Skills Roadmap - Gradio app
-# Converted from the original Google Colab notebook.
+# Skills Roadmap - Streamlit app
+# Converted from the original Gradio version.
 
 from dotenv import load_dotenv
 import os
 import json
 import re
-import gradio as gr
+import streamlit as st
 from openai import OpenAI
 
 load_dotenv()
@@ -27,7 +27,7 @@ MODEL_NAME = "openai/gpt-oss-20b"
 # - Student level
 # - Learning goal
 # - Available time
-# - Daily study time
+# - Daily study time                                       
 # - Existing skills
 # - Learning style
 # - Purpose
@@ -306,165 +306,7 @@ def roadmap_to_markdown(data):
 
 
 # ============================================================
-# STEP 8: CUSTOM UI STYLING
-# ============================================================
-# This CSS makes our Gradio application look like a modern
-# AI web application instead of a basic Python interface.
-
-custom_css = """
-
-/* General font for elegance and readability */
-body {
-    font-family: 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-}
-
-/* Main application container */
-.gradio-container {
-    max-width: 1200px !important;
-    margin: auto !important;
-}
-
-/* Hero section */
-#hero {
-    text-align: center;
-    padding: 45px 25px;
-    border-radius: 25px;
-    margin-bottom: 30px;
-
-    background: linear-gradient(
-        135deg,
-        #667eea,
-        #764ba2
-    );
-
-    color: white;
-}
-
-/* Hero title */
-#hero h1 {
-    font-size: 48px; /* Slightly larger for impact */
-    margin-bottom: 10px;
-    font-weight: 700; /* Bolder */
-}
-
-/* Hero text */
-#hero p {
-    font-size: 20px; /* Slightly larger for elegance */
-    line-height: 1.6; /* Better readability */
-}
-
-/* General heading adjustments for professionalism */
-h1 {
-    font-size: 3em; /* Larger headings */
-    font-weight: 600;
-}
-h2 {
-    font-size: 2em;
-    font-weight: 500;
-}
-h3 {
-    font-size: 1.5em;
-    font-weight: 500;
-}
-
-/* Generate button */
-.generate-btn {
-    font-size: 18px !important;
-    font-weight: bold !important;
-    border-radius: 14px !important;
-    min-height: 55px !important;
-    /* Adding some subtle shadow for more modern look */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-/* Output area */
-.output-box {
-    border-radius: 20px !important;
-    padding: 20px; /* Add padding for better look */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); /* Subtle shadow */
-}
-
-/* Input labels and info text */
-.gradio-app label {
-    font-weight: 500; /* Make labels a bit bolder */
-    font-size: 1.1em;
-}
-
-.gradio-app .gr-form-text { /* For info text */
-    font-size: 0.9em;
-    color: #555;
-}
-
-/* Remove default footer */
-footer {
-    display: none !important;
-}
-
-"""
-
-
-
-# ============================================================
-# STEP 9: MAIN APPLICATION FUNCTION
-# ============================================================
-# This function connects:
-#
-# Gradio inputs
-#       ↓
-# AI roadmap generator
-#       ↓
-# Markdown formatter
-#       ↓
-# Gradio output
-#
-# So when the user clicks the button, this function runs.
-
-def create_roadmap(
-    goal,
-    level,
-    duration,
-    daily_time,
-    current_skills,
-    learning_style,
-    purpose,
-    interests
-):
-
-    # --------------------------------------------------------
-    # Generate roadmap using our AI function
-    # --------------------------------------------------------
-
-    data, error = generate_roadmap(
-        goal,
-        level,
-        duration,
-        daily_time,
-        current_skills,
-        learning_style,
-        purpose,
-        interests
-    )
-
-    # --------------------------------------------------------
-    # If something went wrong
-    # --------------------------------------------------------
-
-    if error:
-
-        return f"""
-## ❌ Unable to Generate Roadmap
-
-{error}
-"""
-
-    # --------------------------------------------------------
-    # Convert AI JSON into beautiful Markdown
-    # --------------------------------------------------------
-
-    return roadmap_to_markdown(data)
-
-# ============================================================
-# HELPER FUNCTION: GENERATE ROADMAP
+# STEP 8: HELPER FUNCTION: GENERATE ROADMAP
 # ============================================================
 # This function sends the student's profile to Groq and
 # returns the AI-generated roadmap. It also handles errors.
@@ -561,260 +403,243 @@ def generate_roadmap(
 
         return None, f"Error generating roadmap: {e}"
 
+
+
 # ============================================================
-# STEP 10: BUILD ROADMAP AI INTERFACE
+# STEP 9: MAIN APPLICATION FUNCTION
 # ============================================================
-# Gradio will create the complete web interface for us.
+# This function connects:
+#
+# Streamlit inputs
+#       ↓
+# AI roadmap generator
+#       ↓
+# Markdown formatter
+#       ↓
+# Streamlit output
+#
+# User ke inputs ko AI ko bhejte hain, aur output display karte hain.
 
-import gradio as gr
+def create_roadmap(
+    goal,
+    level,
+    duration,
+    daily_time,
+    current_skills,
+    learning_style,
+    purpose,
+    interests
+):
 
+    # --------------------------------------------------------
+    # Generate roadmap using our AI function
+    # --------------------------------------------------------
 
-with gr.Blocks(
-    theme=gr.themes.Soft(),
-    css=custom_css,
-    title="Skills Roadmap"
-) as app:
+    data, error = generate_roadmap(
+        goal,
+        level,
+        duration,
+        daily_time,
+        current_skills,
+        learning_style,
+        purpose,
+        interests
+    )
+
+    # --------------------------------------------------------
+    # If something went wrong
+    # --------------------------------------------------------
+
+    if error:
+
+        return f"""
+## ❌ Unable to Generate Roadmap
+
+{error}
+"""
+
+    # --------------------------------------------------------
+    # Convert AI JSON into beautiful Markdown
+    # --------------------------------------------------------
+
+    return roadmap_to_markdown(data)
+
+# ============================================================
+# STEP 10: PAGE CONFIGURATION & STREAMLIT INTERFACE
+# ============================================================
+# Streamlit page configuration sets up the app's appearance.
+
+st.set_page_config(
+    page_title="Skills Roadmap",
+    page_icon="🗺️",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
+
+def main():
 
     # ========================================================
     # HERO SECTION
     # ========================================================
-
-    gr.HTML("""
-    <div id="hero">
-
-        <h1>🗺️ Skills Roadmap</h1>
-
-        <p>
-            Your personalized learning journey.
-        </p>
-
-        <p>
-            Tell us where you are.
-            We'll help you discover where to go. ✨
-        </p>
-
+    
+    st.markdown("""
+    <div style="text-align: center; padding: 40px 20px; 
+                background: linear-gradient(135deg, #667eea, #764ba2); 
+                border-radius: 15px; color: white; margin-bottom: 30px;">
+        <h1 style="font-size: 48px; margin-bottom: 10px;">🗺️ Skills Roadmap</h1>
+        <p style="font-size: 20px; line-height: 1.6;">Your personalized learning journey.</p>
+        <p style="font-size: 18px;">Tell us where you are. We'll help you discover where to go. ✨</p>
     </div>
-    """)
-
+    """, unsafe_allow_html=True)
+    
     # ========================================================
     # FORM HEADING
     # ========================================================
-
-    gr.Markdown(
-        """
-# 🎓 Build Your Personalized Skills Roadmap
-
-Tell us about yourself and we will create a
-learning path designed specifically for you.
-"""
-    )
-
+    
+    st.markdown("""
+    # 🎓 Build Your Personalized Skills Roadmap
+    
+    Tell us about yourself and we will create a
+    learning path designed specifically for you.
+    """)
+    
     # ========================================================
-    # INPUT SECTION
+    # INPUT SECTION - TWO COLUMNS
     # ========================================================
-
-    with gr.Row():
-
-        # ----------------------------------------------------
-        # LEFT COLUMN
-        # ----------------------------------------------------
-
-        with gr.Column():
-
-            goal = gr.Textbox(
-                label="🎯 What do you want to learn?",
-                placeholder=(
-                    "e.g. Data Science, Web Development, "
-                    "Artificial Intelligence..."
-                ),
-                info="Enter your main learning goal."
-            )
-
-            level = gr.Dropdown(
-                choices=[
-                    "Beginner",
-                    "Intermediate",
-                    "Expert"
-                ],
-                label="📊 Current Skill Level",
-                value="Beginner"
-            )
-
-            duration = gr.Dropdown(
-                choices=[
-                    "7 days",
-                    "2 weeks",
-                    "1 month",
-                    "2 months",
-                    "3 months",
-                    "6 months",
-                    "1 year"
-                ],
-                label="⏳ How much time do you have?",
-                value="3 months"
-            )
-
-            daily_time = gr.Dropdown(
-                choices=[
-                    "30 minutes/day",
-                    "1 hour/day",
-                    "2 hours/day",
-                    "3 hours/day",
-                    "4+ hours/day"
-                ],
-                label="🕐 Study Time Per Day",
-                value="2 hours/day"
-            )
-
-        # ----------------------------------------------------
-        # RIGHT COLUMN
-        # ----------------------------------------------------
-
-        with gr.Column():
-
-            current_skills = gr.Textbox(
-                label="💻 What do you already know?",
-                placeholder=(
-                    "e.g. Basic Python, HTML/CSS, "
-                    "Statistics..."
-                ),
-                lines=4
-            )
-
-            learning_style = gr.Radio(
-                choices=[
-                    "Theory + Practice",
-                    "Mostly Projects",
-                    "Mostly Theory",
-                    "Mixed / Not Sure"
-                ],
-                label="📚 Preferred Learning Style",
-                value="Theory + Practice"
-            )
-
-            purpose = gr.Dropdown(
-                choices=[
-                    "Career",
-                    "University / Studies",
-                    "Personal Learning",
-                    "Build a Project",
-                    "Freelancing",
-                    "Other"
-                ],
-                label="🎓 Why do you want to learn this?",
-                value="Career"
-            )
-
-            interests = gr.Textbox(
-                label="⭐ Specific Interests (Optional)",
-                placeholder=(
-                    "e.g. Machine Learning, NLP, "
-                    "Computer Vision..."
-                ),
-                lines=3
-            )
-
+    
+    col1, col2 = st.columns(2)
+    
+    # -------- LEFT COLUMN --------
+    with col1:
+        st.subheader("📋 Learning Profile")
+        
+        goal = st.text_input(
+            label="🎯 What do you want to learn?",
+            placeholder="e.g. Data Science, Web Development, Artificial Intelligence...",
+            help="Enter your main learning goal."
+        )
+        
+        level = st.selectbox(
+            label="📊 Current Skill Level",
+            options=["Beginner", "Intermediate", "Expert"],
+            index=0
+        )
+        
+        duration = st.selectbox(
+            label="⏳ How much time do you have?",
+            options=["7 days", "2 weeks", "1 month", "2 months", "3 months", "6 months", "1 year"],
+            index=4  # Default to 3 months
+        )
+        
+        daily_time = st.selectbox(
+            label="🕐 Study Time Per Day",
+            options=["30 minutes/day", "1 hour/day", "2 hours/day", "3 hours/day", "4+ hours/day"],
+            index=2  # Default to 2 hours/day
+        )
+    
+    # -------- RIGHT COLUMN --------
+    with col2:
+        st.subheader("🎯 Your Preferences")
+        
+        current_skills = st.text_area(
+            label="💻 What do you already know?",
+            placeholder="e.g. Basic Python, HTML/CSS, Statistics...",
+            height=100
+        )
+        
+        learning_style = st.radio(
+            label="📚 Preferred Learning Style",
+            options=["Theory + Practice", "Mostly Projects", "Mostly Theory", "Mixed / Not Sure"],
+            index=0
+        )
+        
+        purpose = st.selectbox(
+            label="🎓 Why do you want to learn this?",
+            options=["Career", "University / Studies", "Personal Learning", "Build a Project", "Freelancing", "Other"],
+            index=0
+        )
+        
+        interests = st.text_area(
+            label="⭐ Specific Interests (Optional)",
+            placeholder="e.g. Machine Learning, NLP, Computer Vision...",
+            height=80
+        )
+    
     # ========================================================
     # GENERATE BUTTON
     # ========================================================
-
-    generate_btn = gr.Button(
-        "✨ Generate My Roadmap",
-        variant="primary",
-        elem_classes="generate-btn"
-    )
-
-    # ========================================================
-    # DIVIDER
-    # ========================================================
-
-    gr.Markdown("---")
-
+    
+    st.markdown("---")
+    
+    col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
+    
+    with col_btn2:
+        if st.button(
+            "✨ Generate My Roadmap",
+            use_container_width=True,
+            type="primary"
+        ):
+            # ========================================================
+            # GENERATE ROADMAP
+            # ========================================================
+            
+            with st.spinner("🚀 Generating your personalized roadmap..."):
+                
+                roadmap_markdown = create_roadmap(
+                    goal,
+                    level,
+                    duration,
+                    daily_time,
+                    current_skills,
+                    learning_style,
+                    purpose,
+                    interests
+                )
+                
+                # Store in session state taaki scroll na ho jaye
+                st.session_state.roadmap_output = roadmap_markdown
+    
     # ========================================================
     # OUTPUT SECTION
     # ========================================================
-
-    gr.Markdown(
-        """
-# 🗺️ Your Personalized Roadmap
-
-Your personalized learning journey will appear below.
-"""
-    )
-
-    output = gr.Markdown(
-        """
-### 👋 Welcome to Skills Roadmap!
-
-Fill in your learning profile above and click:
-
-### ✨ Generate My Roadmap
-
-Your personalized roadmap will appear here.
-""",
-        elem_classes="output-box"
-    )
-
-    # ========================================================
-    # BUTTON EVENT
-    # ========================================================
-    # When the button is clicked:
-    #
-    # User inputs
-    #      ↓
-    # create_roadmap()
-    #      ↓
-    # Groq AI
-    #      ↓
-    # formatted roadmap
-    #      ↓
-    # output
-    #
-    # The inputs list MUST match the order of the function
-    # parameters.
-
-    generate_btn.click(
-
-        fn=create_roadmap,
-
-        inputs=[
-            goal,
-            level,
-            duration,
-            daily_time,
-            current_skills,
-            learning_style,
-            purpose,
-            interests
-        ],
-
-        outputs=output
-    )
-
+    
+    st.markdown("---")
+    
+    st.markdown("""
+    # 🗺️ Your Personalized Roadmap
+    
+    Your personalized learning journey will appear below.
+    """)
+    
+    # Display roadmap agar generate ho gaya ho
+    if "roadmap_output" in st.session_state:
+        st.markdown(st.session_state.roadmap_output)
+    else:
+        st.info("""
+        ### 👋 Welcome to Skills Roadmap!
+        
+        Fill in your learning profile above and click:
+        
+        ### ✨ Generate My Roadmap
+        
+        Your personalized roadmap will appear here.
+        """)
+    
     # ========================================================
     # FOOTER
     # ========================================================
-
-    gr.Markdown(
-        """
----
-<center>
-
-**🗺️ Skills Roadmap**
-
-*Your path. Your pace. Your progress.*
-
-</center>
-"""
-    )
-
+    
+    st.markdown("---")
+    st.markdown("""
+    <center>
+    
+    **🗺️ Skills Roadmap**
+    
+    *Your path. Your pace. Your progress.*
+    
+    </center>
+    """, unsafe_allow_html=True)
 
 
 if __name__ == "__main__":
-    app.launch(
-        server_name="127.0.0.1",
-        server_port=7862,
-        share=False,
-        show_error=True,
-        quiet=False
-    )
+    main()
